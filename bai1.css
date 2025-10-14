@@ -1,0 +1,140 @@
+/* ==== 1. Biến CSS cho Light/Dark Mode ==== */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --card-bg: #f0f0f0;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+}
+
+body.dark {
+  --bg-color: #121212;
+  --text-color: #ffffff;
+  --card-bg: #1e1e1e;
+  --card-shadow: rgba(255, 255, 255, 0.1);
+}
+
+/* ==== 2. Reset cơ bản ==== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* ==== 3. Header ==== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--card-bg);
+  box-shadow: 0 2px 5px var(--card-shadow);
+}
+
+/* ==== 4. Toggle switch ==== */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: gray;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* ==== 5. Layout chính ==== */
+.container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  min-height: calc(100vh - 80px); /* Trừ chiều cao header */
+}
+
+.sidebar {
+  background-color: var(--card-bg);
+  padding: 1rem;
+  border-right: 1px solid #ccc;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* ==== 6. Movie Card ==== */
+.movie-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--card-shadow);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.movie-card img {
+  width: 100%;
+  height: auto;
+}
+
+.movie-card h3 {
+  margin: 0.5rem 0 0;
+}
+
+.movie-card p {
+  margin-bottom: 1rem;
+  color: gray;
+}
+.movie-card h4 {
+  margin: 0.5rem 0 0;
+}
+
+.movie-card p {
+  margin-bottom: 1rem;
+  color: gray;
+}
+
+.movie-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 16px var(--card-shadow);
+}
