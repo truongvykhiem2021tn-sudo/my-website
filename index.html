@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISHOP - Cửa hàng trực tuyến</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Poppins',sans-serif;background:#f6f8fa;color:#333;}
+    header{background:linear-gradient(90deg,#222,#444);color:#fff;padding:15px 40px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+    header h1{color:#4CAF50;margin:0;}
+    .menu button{background:#4CAF50;border:none;color:#fff;padding:8px 15px;margin-left:10px;border-radius:20px;cursor:pointer;transition:.3s;font-weight:600;}
+    .menu button:hover{background:#43a047;}
+    .banner{background:url('https://images.unsplash.com/photo-1607083206424-1ec9a59f7d87?auto=format&fit=crop&w=1600&q=80') center/cover;height:230px;display:flex;align-items:center;justify-content:center;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.6);font-size:2em;font-weight:600;}
+
+    .search-bar{display:flex;justify-content:center;align-items:center;gap:10px;padding:20px;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.1);}
+    .search-bar input{padding:10px;width:250px;border:1px solid #ccc;border-radius:20px;}
+    .search-bar select{padding:10px;border-radius:20px;border:1px solid #ccc;}
+    .search-bar button{background:#4CAF50;color:#fff;border:none;padding:10px 18px;border-radius:20px;cursor:pointer;font-weight:600;}
+    .search-bar button:hover{background:#43a047;}
+
+    .product-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:40px;max-width:1200px;margin:auto;}
+    .product{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden;transition:.3s;}
+    .product:hover{transform:translateY(-5px);}
+    .product img{width:100%;height:200px;object-fit:cover;}
+    .product-info{text-align:center;padding:15px;}
+    .product h3{font-size:18px;margin:10px 0;}
+    .product p{color:#777;font-size:14px;}
+    .product button{background:#4CAF50;color:#fff;border:none;padding:8px 14px;border-radius:5px;cursor:pointer;font-weight:600;margin:3px;}
+    .product button:hover{background:#43a047;}
+    footer{background:#111;color:#fff;text-align:center;padding:20px;margin-top:50px;font-size:14px;}
+
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,.6);z-index:999;}
+    .modal-content{background:#fff;width:90%;max-width:500px;border-radius:10px;padding:25px;animation:fadeIn .3s;position:relative;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    .modal-content h2{text-align:center;color:#4CAF50;margin-bottom:15px;}
+    input,textarea{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:5px;font-size:15px;}
+    .modal-content button{width:100%;background:#4CAF50;color:#fff;border:none;padding:10px 20px;margin-top:8px;border-radius:5px;font-weight:600;cursor:pointer;}
+    .modal-content button:hover{background:#43a047;}
+    .close-btn{background:#555 !important;}
+    .cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;}
+    .total{text-align:right;margin-top:10px;font-weight:700;}
+    .detail-img{width:100%;height:220px;object-fit:cover;border-radius:8px;margin-bottom:15px;}
+    @media(max-width:600px){header{flex-direction:column;text-align:center;}.menu button{margin:5px 0;}}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ISHOP</h1>
+  <div class="menu">
+    <button onclick="openModal('login-modal')"><i class="fa fa-user"></i> Đăng nhập</button>
+    <button onclick="openModal('register-modal')"><i class="fa fa-user-plus"></i> Đăng ký</button>
+    <button onclick="openModal('profile-modal')"><i class="fa fa-id-card"></i> Hồ sơ</button>
+    <button onclick="openModal('cart-modal')"><i class="fa fa-shopping-cart"></i> Giỏ (<span id="cart-count">0</span>)</button>
+  </div>
+</header>
+
+<div class="banner">ISHOP – Thế giới thiết bị thông minh và hiện đại!</div>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="Tìm sản phẩm...">
+  <select id="category">
+    <option value="all">Tất cả</option>
+    <option value="smart">Thiết bị thông minh</option>
+    <option value="accessory">Phụ kiện</option>
+    <option value="laptop">Laptop</option>
+    <option value="phone">Điện thoại</option>
+  </select>
+  <button onclick="filterProducts()">Tìm kiếm</button>
+</div>
+
+<section class="product-list" id="product-list"></section>
+
+<!-- Modal chi tiết sản phẩm -->
+<div class="modal" id="detail-modal">
+  <div class="modal-content">
+    <h2>Thông tin sản phẩm</h2>
+    <img id="detail-img" class="detail-img" src="">
+    <h3 id="detail-name"></h3>
+    <p><b>Giá:</b> <span id="detail-price"></span>₫</p>
+    <p id="detail-desc"></p>
+    <button id="detail-add"></button>
+    <button class="close-btn" onclick="closeModal('detail-modal')">Đóng</button>
+  </div>
+</div>
+
+<!-- Các modal đăng nhập, đăng ký, hồ sơ, giỏ hàng -->
+<div class="modal" id="register-modal">
+  <div class="modal-content">
+    <h2>Đăng ký tài khoản</h2>
+    <input id="reg-username" placeholder="Tên đăng nhập">
+    <input id="reg-password" type="password" placeholder="Mật khẩu">
+    <input id="reg-phone" placeholder="Số điện thoại">
+    <textarea id="reg-address" placeholder="Địa chỉ giao hàng"></textarea>
+    <button onclick="register()">Đăng ký</button>
+    <button class="close-btn" onclick="closeModal('register-modal')">Đóng</button>
+  </div>
+</div>
+
+<div class="modal" id="login-modal">
+  <div class="modal-content">
+    <h2>Đăng nhập</h2>
+    <input id="login-username" placeholder="Tên đăng nhập">
+    <input id="login-password" type="password" placeholder="Mật khẩu">
+    <button onclick="login()">Đăng nhập</button>
+    <button class="close-btn" onclick="closeModal('login-modal')">Đóng</button>
+  </div>
+</div>
+
+<div class="modal" id="profile-modal">
+  <div class="modal-content">
+    <h2>Hồ sơ khách hàng</h2>
+    <div id="profile-info"></div>
+    <button class="close-btn" onclick="closeModal('profile-modal')">Đóng</button>
+  </div>
+</div>
+
+<div class="modal" id="cart-modal">
+  <div class="modal-content">
+    <h2>Giỏ hàng</h2>
+    <div id="cart-items"></div>
+    <div class="total">Tổng: <span id="cart-total">0₫</span></div>
+    <button onclick="checkout()">Thanh toán</button>
+    <button class="close-btn" onclick="closeModal('cart-modal')">Đóng</button>
+  </div>
+</div>
+
+<footer>© 2025 ISHOP- HOTLINE 098755643212 .</footer>
+
+<script>
+const products = [
+  {name:"Điện thoại ISHOP X1",price:12000000,desc:"Điện thoại thông minh với màn hình OLED 6.5 inch, camera 108MP, pin 5000mAh.",img:"DT.jpg",category:"phone"},
+  {name:"Laptop ISHOP Air",price:22000000,desc:"Laptop mỏng nhẹ, chip Intel i7 Gen 13, RAM 16GB, SSD 512GB, phù hợp làm việc & học tập.",img:"laptop.jpg",category:"laptop"},
+  {name:"Tai nghe Bluetooth",price:1200000,desc:"Tai nghe không dây kết nối nhanh, âm thanh chất lượng cao, thời lượng pin 24h.",img:"tainghe.jpg",category:"accessory"},
+  {name:"Đồng hồ thông minh",price:2500000,desc:"Thiết bị thông minh theo dõi sức khỏe, đo nhịp tim, kết nối điện thoại.",img:"dongho.jpg",category:"smart"},
+  {name:"Loa Bluetooth ISHOP Sound",price:1800000,desc:"Loa di động âm thanh nổi, pin 10h, chống nước IPX7.",img:"loa.webp",category:"smart"},
+  {name:"Chuột Gaming ISHOP",price:750000,desc:"Chuột chơi game RGB, cảm biến 16000 DPI, thiết kế công thái học.",img:"chuot gaming.jpg",category:"accessory"}
+];
+
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let currentUser = localStorage.getItem('currentUser') || null;
+
+function renderProducts(list){
+  const container=document.getElementById("product-list");
+  container.innerHTML="";
+  list.forEach((p,idx)=>{
+    container.innerHTML+=`
+    <div class="product">
+      <img src="${p.img}">
+      <div class="product-info">
+        <h3>${p.name}</h3>
+        <p>${p.price.toLocaleString()}₫</p>
+        <button onclick="addToCart('${p.name}',${p.price})">Thêm vào giỏ</button>
+        <button onclick="showDetail(${idx})">Xem chi tiết</button>
+      </div>
+    </div>`;
+  });
+}
+renderProducts(products);
+
+function showDetail(index){
+  const p=products[index];
+  document.getElementById('detail-img').src=p.img;
+  document.getElementById('detail-name').textContent=p.name;
+  document.getElementById('detail-price').textContent=p.price.toLocaleString();
+  document.getElementById('detail-desc').textContent=p.desc;
+  document.getElementById('detail-add').textContent="Thêm "+p.name+" vào giỏ";
+  document.getElementById('detail-add').onclick=function(){addToCart(p.name,p.price)};
+  openModal('detail-modal');
+}
+
+function filterProducts(){
+  const keyword=document.getElementById('search').value.toLowerCase();
+  const cat=document.getElementById('category').value;
+  const filtered=products.filter(p=>{
+    const matchName=p.name.toLowerCase().includes(keyword);
+    const matchCat=cat==="all"||p.category===cat;
+    return matchName&&matchCat;
+  });
+  renderProducts(filtered);
+}
+
+function openModal(id){document.getElementById(id).style.display='flex';if(id==='cart-modal')showCart();if(id==='profile-modal')showProfile();}
+function closeModal(id){document.getElementById(id).style.display='none';}
+
+function register(){
+  const u=document.getElementById('reg-username').value.trim();
+  const p=document.getElementById('reg-password').value.trim();
+  const ph=document.getElementById('reg-phone').value.trim();
+  const ad=document.getElementById('reg-address').value.trim();
+  if(!u||!p)return alert("Nhập đủ tên và mật khẩu!");
+  if(users.find(x=>x.username===u))return alert("Tên đã tồn tại!");
+  users.push({username:u,password:p,phone:ph,address:ad});
+  localStorage.setItem('users',JSON.stringify(users));
+  alert("Đăng ký thành công!");
+  closeModal('register-modal');
+}
+
+function login(){
+  const u=document.getElementById('login-username').value.trim();
+  const p=document.getElementById('login-password').value.trim();
+  const user=users.find(x=>x.username===u&&x.password===p);
+  if(!user)return alert("Sai tài khoản hoặc mật khẩu!");
+  currentUser=u;
+  localStorage.setItem('currentUser',u);
+  alert("Xin chào "+u+"!");
+  closeModal('login-modal');
+}
+
+function showProfile(){
+  if(!currentUser)return alert("Bạn chưa đăng nhập!");
+  const user=users.find(x=>x.username===currentUser);
+  document.getElementById('profile-info').innerHTML=`
+    <p><b>Tài khoản:</b> ${user.username}</p>
+    <p><b>SĐT:</b> ${user.phone||'Chưa có'}</p>
+    <p><b>Địa chỉ:</b> ${user.address||'Chưa có'}</p>`;
+}
+
+function addToCart(name,price){
+  const item=cart.find(i=>i.name===name);
+  if(item)item.qty++;else cart.push({name,price,qty:1});
+  localStorage.setItem('cart',JSON.stringify(cart));
+  updateCartCount();
+  alert(name+" đã thêm vào giỏ!");
+}
+function updateCartCount(){document.getElementById('cart-count').textContent=cart.reduce((a,b)=>a+b.qty,0);}
+updateCartCount();
+
+function showCart(){
+  const c=document.getElementById('cart-items'); c.innerHTML='';
+  let total=0;
+  if(cart.length===0)c.innerHTML='<p>Giỏ hàng trống!</p>';
+  else cart.forEach((i,idx)=>{total+=i.price*i.qty;c.innerHTML+=`
+    <div class='cart-item'><span>${i.name} (x${i.qty})</span>
+    <span>${(i.price*i.qty).toLocaleString()}₫</span>
+    <button onclick='removeItem(${idx})'>Xóa</button></div>`;});
+  document.getElementById('cart-total').textContent=total.toLocaleString()+'₫';
+}
+function removeItem(i){cart.splice(i,1);localStorage.setItem('cart',JSON.stringify(cart));updateCartCount();showCart();}
+function checkout(){
+  if(!currentUser)return alert("Đăng nhập để thanh toán!");
+  const user=users.find(u=>u.username===currentUser);
+  if(!user.phone||!user.address)return alert("Cập nhật SĐT & địa chỉ trước!");
+  if(cart.length===0)return alert("Giỏ hàng trống!");
+  alert("Cảm ơn "+user.username+"! Đơn hàng đang được xử lý.");
+  cart=[];localStorage.setItem('cart',JSON.stringify(cart));updateCartCount();showCart();
+}
+</script>
+</body>
+</html>
